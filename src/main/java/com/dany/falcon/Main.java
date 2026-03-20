@@ -2,17 +2,56 @@ package com.dany.falcon;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import com.dany.falcon.ia.AIProvider;
+import com.dany.falcon.ia.AIService;
+import com.dany.falcon.ia.AIServiceFactory;
+import com.dany.falcon.chat.ChatService;
+
+import java.util.List;
+
+
+import java.util.Scanner;
+
+/**
+ *
+ * @author bytrayed
+ */
 public class Main {
+
+    /**
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.print("Hello and welcome!");
+        // TODO code application logic here
+        Scanner sc =new Scanner(System.in);
+
+        int intents =0;
+        System.out.println("Iniciando Chat con IA");
+
+        AIService ai = AIServiceFactory.create(AIProvider.GEMINI);
+        ChatService chat = new ChatService(ai);
+        List<String> comandosSalida = List.of("exit", "salir", "quit","q");
 
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        while(true){
+            System.out.println("pregunta a la IA: ");
+            String entrada= sc.nextLine();
+
+            if(comandosSalida.contains(entrada.toLowerCase())){
+                System.out.println("bye bye");
+                break;
+            }
+            System.out.println("Esperando respuesta de la IA...");
+
+            String res = chat.sendMessage(entrada);
+            System.out.println(res);
+
+
+
+
+            intents ++;
         }
+
     }
+
 }
