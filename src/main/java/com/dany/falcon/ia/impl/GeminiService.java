@@ -1,5 +1,5 @@
 package com.dany.falcon.ia.impl;
-
+import java.time.LocalDateTime;
 
 import com.dany.falcon.ia.*;
 
@@ -42,7 +42,7 @@ public class GeminiService implements AIService {
                     },
                     """.formatted(
                     "user",
-                    new Gson().toJson(initPrompt + memories.getMemoriesAsPrompt())
+                    new Gson().toJson("System:" + initPrompt + "Tus Memorias persistentes actuales:[" + memories.getMemoriesAsPrompt() + "] Fecha Actual: "+ LocalDateTime.now().toString())
             );
             sb.append(init);
         }
