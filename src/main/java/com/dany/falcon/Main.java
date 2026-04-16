@@ -2,6 +2,7 @@ package com.dany.falcon;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import com.dany.falcon.gui.MainApp;
 import com.dany.falcon.ia.AIProvider;
 import com.dany.falcon.ia.AIService;
 import com.dany.falcon.ia.AIServiceFactory;
@@ -18,10 +19,11 @@ import java.util.Scanner;
  */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
+        System.out.println("iniciando desde Main Principal");
+        MainApp.launch(MainApp.class, args);
+    }
+    private static void old (){
 
         Scanner sc =new Scanner(System.in);
 
@@ -45,9 +47,6 @@ public class Main {
 
             String res = chat.sendMessage(entrada);
             System.out.println(res);
-
-
-
 
             intents ++;
         }
