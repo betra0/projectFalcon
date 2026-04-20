@@ -6,12 +6,15 @@ import com.dany.falcon.ia.functions.AddMemoryFunction;
 import com.sun.tools.jconsole.JConsoleContext;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 
 public class ChatService {
 
+    private Map<String, ConversationPreview> prevConvs;
     private AIService aiService;
     private Conversation chat;
     private MemoryManager memories;
@@ -48,6 +51,7 @@ Estilo:
         this.chat = new Conversation();
         this.db = Database.getInstance();
         this.loadMemories();
+        this.loadConvPreviws();
         this.availableFunctions = List.of(
                 new AddMemoryFunction(this)
         );
@@ -59,6 +63,10 @@ Estilo:
     }
     private String getInitPrompt(){
         return systemPrompt + "\n" + personality;
+    }
+
+    private void loadConvPreviws(){
+        this.prevConvs = db.getAllConvsPreviws();
     }
 
     private void loadMemories(){
@@ -100,7 +108,9 @@ Estilo:
     }
     public String sendMessage(String content) {
         Message mes = new Message(content, Message.SenderType.USER);
-        chat.addMessage(mes);
+        // añadir mensaje del user
+        addMessageInChat(mes);
+
         AIRequest req = new AIRequest(chat, this.getInitPrompt(), availableFunctions, memories);
         AIResponse res = aiService.sendMessage(req);
         List<AIFunctionCall> funclist = res.functions();
@@ -108,7 +118,38 @@ Estilo:
             this.executeFunctions(funclist);
         }
         Message reply = res.reply();
-        chat.addMessage(reply);
+        // añadir respuesta de la ia a chat o conversasion
+        addMessageInChat(reply);
         return res.reply().toString();
     }
+
+    private void addMessageInChat(Message mess){
+        synchronized (chat.getLock()) {
+            if(chat.getConvFuture() == null){
+                chat.setTimestamp(System.currentTimeMillis());
+                chat.setConvFuture(CompletableFuture.runAsync(()->{saveConversationInDb(chat);}));
+            }
+            chat.addMessage(mess);
+            mess.setPosition(chat.getMessages().size()-1);
+            chat.getConvFuture().thenRunAsync(()->{saveMessageInDb(mess, chat);});
+        }
+
+    }
+
+    public void saveConversationInDb(Conversation chat){
+        db.saveOrUpdateConversation(chat.getId(), chat.getTimestamp(), chat.getName(), chat.getDescription());
+        this.prevConvs.put(chat.getId(), new ConversationPreview(chat.getId(), chat.getName(), chat.getDescription(), chat.getTimestamp()));
+    }
+    public void saveMessageInDb(Message message, Conversation conv){
+        try{
+            Long memId = db.saveMessage(message, conv.getId());
+            message.setId(memId);
+
+        }catch (Exception e){
+            System.out.println("error al guardar: " + e.toString());
+        }
+
+    }
 }
+
+
