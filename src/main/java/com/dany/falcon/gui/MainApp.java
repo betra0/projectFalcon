@@ -24,7 +24,7 @@ public class MainApp extends Application {
     }
 
     private void initStart(){
-        AIService ai = AIServiceFactory.create(AIProvider.GEMINI);
+        AIService ai = AIServiceFactory.create(AIProvider.GROQ);
         this.chat = new ChatService(ai);
     }
 

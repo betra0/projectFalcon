@@ -2,5 +2,6 @@
 package com.dany.falcon.ia;
 
 public enum AIProvider {
-    GEMINI
+    GEMINI,
+    GROQ
 }

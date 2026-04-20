@@ -21,5 +21,8 @@ public class Config {
     public String getGeminiApiKey() {
         return dotenv.get("GEMINI_API_KEY");
     }
+    public String getGroqApiKey() {
+        return dotenv.get("GROQ_API_KEY");
+    }
 }
 

@@ -2,6 +2,7 @@
 package com.dany.falcon.ia;
 import com.dany.falcon.config.Config;
 import com.dany.falcon.ia.impl.GeminiService;
+import com.dany.falcon.ia.impl.GroqService;
 
 
 public class AIServiceFactory {
@@ -9,6 +10,8 @@ public class AIServiceFactory {
 
     public static AIService create(AIProvider provider) {
         switch (provider) {
+            case GROQ:
+                return new GroqService(config.getGroqApiKey());
             case GEMINI:
                 return new GeminiService(config.getGeminiApiKey());
             default:
